@@ -1,7 +1,15 @@
-function createCell(_, idx) {
-  return `
-      <div data-col="${idx}" class="cell" contenteditable ></div>
+function createCell(row) {
+  return function(_, idx) {
+    return `
+      <div 
+        data-col="${idx}" 
+        data-id="${row}:${idx}" 
+        data-type="cell"
+        class="cell" 
+        contenteditable
+      ></div>
   `
+  }
 }
 
 function createCol(col, idx) {
@@ -44,9 +52,12 @@ export function createTemplate(rowsCount = 15) {
       .map(createCol)
       .join('')
   rows.push(createRow(cols))
-  for (let i = 0; i < rowsCount; i++) {
-    const cells = new Array(colsCount).fill('').map(createCell).join('')
-    rows.push(createRow(cells, i+1))
+  for (let row = 0; row < rowsCount; row++) {
+    const cells = new Array(colsCount)
+        .fill('')
+        .map(createCell(row))
+        .join('')
+    rows.push(createRow(cells, row + 1))
   }
   return rows.join('')
 }
