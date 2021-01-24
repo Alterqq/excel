@@ -1,19 +1,26 @@
-function createCell() {
+function createCell(_, idx) {
   return `
-      <div class="cell" contenteditable></div>
+      <div data-col="${idx}" class="cell" contenteditable ></div>
   `
 }
 
-function createCol(col) {
+function createCol(col, idx) {
   return `
-      <div class="column">${col}</div>
+      <div class="column" data-type="resizable" data-col="${idx}">
+        ${col}
+        <div class="col-resize" data-resize="col"></div>
+      </div>
 `
 }
 
-function createRow(content, num = '') {
+function createRow(content, idx) {
+  const resize = idx ? '<div class="row-resize" data-resize="row"></div>' : ''
   return `
-      <div class="row">
-        <div class="row-info">${num}</div>
+      <div class="row" data-type="resizable">
+        <div class="row-info">
+          ${idx ? idx : ''}
+          ${resize}
+        </div>
         <div class="row-data">${content}</div>
       </div>
 `
@@ -27,17 +34,6 @@ const CODES = {
 const toChar = (_, idx) => {
   return String.fromCharCode(CODES.A + idx)
 }
-
-/*
-<div class="row">
-        <div class="row-info">1</div>
-        <div class="row-data">
-          <div class="cell selected" contenteditable>A1</div>
-          <div class="cell" contenteditable>A2</div>
-          <div class="cell" contenteditable>A3</div>
-        </div>
-      </div>
-*/
 
 export function createTemplate(rowsCount = 15) {
   const colsCount = CODES.Z - CODES.A + 1
