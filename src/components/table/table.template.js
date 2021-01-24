@@ -1,12 +1,12 @@
-function createCell() {
+function createCell(_, idx) {
   return `
-      <div class="cell" contenteditable></div>
+      <div data-col="${idx}" class="cell" contenteditable ></div>
   `
 }
 
-function createCol(col) {
+function createCol(col, idx) {
   return `
-      <div class="column" data-type="resizable">
+      <div class="column" data-type="resizable" data-col="${idx}">
         ${col}
         <div class="col-resize" data-resize="col"></div>
       </div>
