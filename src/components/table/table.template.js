@@ -1,4 +1,14 @@
-function createCell(row) {
+const CODES = {
+  A: 65,
+  Z: 90
+}
+const DEFAULT_VALUE = 120
+
+const getWidth = (state, idx) => {
+  return (state[idx] || DEFAULT_VALUE) + 'px'
+}
+
+function createCell(row, state) {
   return function(_, idx) {
     return `
       <div 
@@ -7,14 +17,19 @@ function createCell(row) {
         data-type="cell"
         class="cell" 
         contenteditable
+        style="width: ${getWidth(state.colState, idx)}"
       ></div>
   `
   }
 }
 
-function createCol(col, idx) {
+function createCol({col, idx, width}) {
   return `
-      <div class="column" data-type="resizable" data-col="${idx}">
+      <div 
+        class="column" 
+        data-type="resizable" 
+        data-col="${idx}" 
+        style="width: ${width}">
         ${col}
         <div class="col-resize" data-resize="col"></div>
       </div>
@@ -34,28 +49,32 @@ function createRow(content, idx) {
 `
 }
 
-const CODES = {
-  A: 65,
-  Z: 90
-}
-
 const toChar = (_, idx) => {
   return String.fromCharCode(CODES.A + idx)
 }
 
-export function createTemplate(rowsCount = 15) {
+const withWidthFrom = (state) => {
+  return function(col, idx) {
+    return {
+      col, idx, width: getWidth(state.colState, idx)
+    }
+  }
+}
+
+export function createTemplate(rowsCount = 15, state = {}) {
   const colsCount = CODES.Z - CODES.A + 1
   const rows = []
   const cols = new Array(colsCount)
       .fill('')
       .map(toChar)
+      .map(withWidthFrom(state))
       .map(createCol)
       .join('')
   rows.push(createRow(cols))
   for (let row = 0; row < rowsCount; row++) {
     const cells = new Array(colsCount)
         .fill('')
-        .map(createCell(row))
+        .map(createCell(row, state))
         .join('')
     rows.push(createRow(cells, row + 1))
   }

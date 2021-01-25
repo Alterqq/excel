@@ -9,6 +9,7 @@ import {
 } from '@/components/table/table.function';
 import {TableSelection} from '@/components/table/TableSelection';
 import {$} from '@core/dom';
+import * as actions from '@/redux/actions'
 
 export class Table extends ExcelComponent {
   constructor($root, options) {
@@ -16,13 +17,13 @@ export class Table extends ExcelComponent {
       name: 'Table',
       listeners: ['mousedown', 'keydown', 'input'],
       ...options
-    });
+    })
   }
 
   static className = 'excel__table'
 
   toHTML() {
-    return createTemplate()
+    return createTemplate(20, this.store.getState())
   }
 
   prepare() {
@@ -33,7 +34,6 @@ export class Table extends ExcelComponent {
     super.init()
     const $cell = this.$root.find('[data-id="0:0"]')
     this.selectCell($cell)
-
     this.$on('formula:input', text => {
       this.selecton.current.text(text)
     })
@@ -43,11 +43,21 @@ export class Table extends ExcelComponent {
   selectCell($cell) {
     this.selecton.select($cell)
     this.$emit('table:select', $cell)
+    this.$dispatch({type: 'TEST'})
+  }
+
+  async resizeTable(event) {
+    try {
+      const data = await resizeHandler(this.$root, event)
+      this.$dispatch(actions.tableResize(data))
+    } catch (e) {
+      console.warn(e.message)
+    }
   }
 
   onMousedown(event) {
     if (shouldResize(event)) {
-      resizeHandler(this.$root, event)
+      this.resizeTable(event)
     } else if (isCell(event)) {
       const $target = $(event.target)
       if (event.shiftKey) {
@@ -55,7 +65,7 @@ export class Table extends ExcelComponent {
             .map(id => this.$root.find(`[data-id="${id}"]`))
         this.selecton.selectGroup($cells)
       } else {
-        this.selecton.select($target)
+        this.selectCell($target)
       }
     }
   }
