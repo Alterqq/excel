@@ -10,6 +10,7 @@ import {
 import {TableSelection} from '@/components/table/TableSelection';
 import {$} from '@core/dom';
 import * as actions from '@/redux/actions'
+import {defaultStyles} from '@/constants';
 
 export class Table extends ExcelComponent {
   constructor($root, options) {
@@ -39,11 +40,18 @@ export class Table extends ExcelComponent {
       this.updateTextInStore(text)
     })
     this.$on('formula:done', () => this.selecton.current.focus())
+
+    this.$on('toolbar:applyStyle', style => {
+      this.selecton.applyStyle(style)
+    })
   }
 
   selectCell($cell) {
     this.selecton.select($cell)
     this.$emit('table:select', $cell)
+    const styles = $cell.getStyles(Object.keys(defaultStyles))
+    console.log(styles)
+    this.$dispatch(actions.changeStyles(styles))
   }
 
   async resizeTable(event) {
