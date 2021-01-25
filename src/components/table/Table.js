@@ -41,8 +41,12 @@ export class Table extends ExcelComponent {
     })
     this.$on('formula:done', () => this.selecton.current.focus())
 
-    this.$on('toolbar:applyStyle', style => {
-      this.selecton.applyStyle(style)
+    this.$on('toolbar:applyStyle', value => {
+      this.selecton.applyStyle(value)
+      this.$dispatch(actions.applyStyle({
+        value,
+        ids: this.selecton.selectedIds
+      }))
     })
   }
 
