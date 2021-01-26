@@ -11,6 +11,7 @@ import {TableSelection} from '@/components/table/TableSelection';
 import {$} from '@core/dom';
 import * as actions from '@/redux/actions'
 import {defaultStyles} from '@/constants';
+import {parse} from '@core/parse';
 
 export class Table extends ExcelComponent {
   constructor($root, options) {
@@ -35,9 +36,10 @@ export class Table extends ExcelComponent {
     super.init()
     const $cell = this.$root.find('[data-id="0:0"]')
     this.selectCell($cell)
-    this.$on('formula:input', text => {
-      this.selecton.current.text(text)
-      this.updateTextInStore(text)
+    this.$on('formula:input', value => {
+      this.selecton.current.attr('data-value', value)
+      this.selecton.current.text(parse(value))
+      this.updateTextInStore(value)
     })
     this.$on('formula:done', () => this.selecton.current.focus())
 
